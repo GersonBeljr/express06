@@ -1,7 +1,7 @@
 //instalar Mysql2 e executar uma query
 
 const express = require('express');
-const mysql = require('mysql2')
+const mysql = require('mysql2');
 
 const server = express();
 
@@ -31,12 +31,29 @@ CampoLargoConectada.connect(error=>{
 //criando a rota que executa a query
 
 server.get('/',(req,res)=>{
-    CampoLargoConectada.query('SELECT * FROM tasks',(err,resultados,fields)=>{
+    //objt para todos end points
+    let resul ={
+        status: 'sucesso',
+        message: null,
+        data: null
+    };
+
+    //fazendo a conexão
+
+    CampoLargoConectada.query('SELECT * FROM tasks',(err,resultados)=>{
         if(err){
-            console.log(err.message);
-            res.send("Erro ao acessar os dados");
+            resul.status = 'erro';
+            resul.message = 'erro na obtenção das tarefas';
+            resul.data = [];
+           // res.send(resul);
+           res.json(resul);
+            // console.log(err.message);
+            // res.send("Erro ao acessar os dados");
         }else{
-            res.send(resultados);
+            resul.status = 'sucesso';
+            resul.message = 'sucesso na obtenção das tarefas';
+            resul.data = resultados;
+            res.send(resul);
         }
     })
 })
