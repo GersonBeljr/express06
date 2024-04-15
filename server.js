@@ -2,58 +2,66 @@
 
 const express = require('express');
 const mysql = require('mysql2');
+const sqlConfig = require('./mysql_config');
+const fun = require('./functions');
+const cors = require('cors');
 
 const server = express();
 
 server.listen(3000,()=>{
-    console.log('Servidor ONLINE');
+    console.log('Servidor vivo e operante');
 });
 
-//Criação dp banco;
+server.use(cors());
 
-const CampoLargoConectada = mysql.createConnection({
-    host:'localHost',
-    user: 'user_bd_tasks',
-    password: 'QL0P4TDcQGB2R97Djet7vXYHggatTZE4',
-    database: 'nodejs_tasks'
-})
-
-//criado a conexão com o banco e o server
-CampoLargoConectada.connect(error=>{
-    if (error) {
-        console.log("Erro de conexão SQL "+ error.message);
-        return
-    }
-    console.log("Festa total");
-    
-})
-
-//criando a rota que executa a query
+const mySQLconnected = mysql.createConnection(sqlConfig);
 
 server.get('/',(req,res)=>{
-    //objt para todos end points
-    let resul ={
-        status: 'sucesso',
-        message: null,
-        data: null
-    };
-
-    //fazendo a conexão
-
-    CampoLargoConectada.query('SELECT * FROM tasks',(err,resultados)=>{
+    mySQLconnected.query('SELECT * FROM tasks',(err,results)=>{
         if(err){
-            resul.status = 'erro';
-            resul.message = 'erro na obtenção das tarefas';
-            resul.data = [];
-           // res.send(resul);
-           res.json(resul);
-            // console.log(err.message);
-            // res.send("Erro ao acessar os dados");
+            res.json(fun.reponse('error','Erro encontrado: '+err.message))
         }else{
-            resul.status = 'sucesso';
-            resul.message = 'sucesso na obtenção das tarefas';
-            resul.data = resultados;
-            res.send(resul);
+            res.json(fun.reponse('Tudo nos conformes','tasks listadas com sucesso',results))
         }
     })
 })
+
+// //criado a conexão com o banco e o server
+// mySQLconnected.connect(error=>{
+//     if (error) {
+//         console.log("Erro de conexão SQL "+ error.message);
+//         return
+//     }
+//     console.log("Festa total");
+    
+// })
+
+// //criando a rota que executa a query
+
+// server.get('/',(req,res)=>{
+//     //objt para todos end points
+//     let resul ={
+//         status: 'sucesso',
+//         message: null,
+//         data: null
+//     };
+
+//     //fazendo a conexão
+
+//     mySQLconnected.query('SELECT * FROM tasks',(err,resultados)=>{
+//         if(err){
+//             resul.status = 'erro';
+//             resul.message = 'erro na obtenção das tarefas';
+//             resul.data = [];
+//            // res.send(resul);
+//            res.json(resul);
+//             // console.log(err.message);
+//             // res.send("Erro ao acessar os dados");
+//         }else{
+//             resul.status = 'sucesso';
+//             resul.message = 'sucesso na obtenção das tarefas';
+//             resul.data = resultados;
+//             res.send(resul);
+//         }
+//     })
+// })
